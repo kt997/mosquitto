@@ -1,0 +1,120 @@
+INSTALLATION:
+
+sudo apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
+sudo apt-get update
+sudo apt-get install mosquitto mosquitto-clients
+
+DEPENDENCIES:
+sudo apt-get install libc-ares-dev libwebsockets-dev libssl-dev xsltproc docbook-xsl
+
+32bit on 64bit(optional?):
+sudo apt-get install libssl-dev:i386
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+TO INSTALL C/CPP LIBRARIES:
+1.  Download mosquitto repository.
+2.  Go to lib folder in repository.
+3.  run sudo make (or sudo make install).
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+QUICK START:
+
+1.  Start mosquitto: 
+    --- mosquitto -v (use -d instead if want it to run in background)
+
+2.  Then use mosquitto_sub to subscribe to a topic:
+    --- mosquitto_sub -t 'test/topic' -v
+
+3.  And to publish a message:
+    --- mosquitto_pub -t 'test/topic' -m 'hello world'
+
+4.  To run C/C++ code:
+    --- Compile it with "-lmosquitto" option.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    
+SYSTEM STATISTICS:
+Subscribe to:
+$SYS/broker/clients/connected
+$SYS/broker/clients/disconnected
+$SYS/broker/clients/total
+$SYS/broker/messages/sent
+$SYS/broker/uptime
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+TLS/SSL SETUP:
+
+1.  Create CA private key for creating self signed certificate of CA:
+    --- openssl genrsa -out ca.key
+    
+2.  Create Server private key which will be used by the Broker:
+    --- openssl genrsa -out sv.key
+    
+3.  Create CA Certificate:
+    --- openssl req -new -x509 -days 365 -key ca.key -out ca.crt
+
+4.  Create Server Certificate Request:
+    --- openssl req -new -out sv.csr -key sv.key 
+
+5.  Create Server Certificate by signing it from CA:
+    --- openssl x509 -req -in sv.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out sv.crt -days 360
+    
+6.  Following files are needed now:
+    ca.crt, sv.key, sv.crt
+    
+7.  Copy them to the following locations:
+    cafile /etc/mosquitto/ca_certificates/ca.crt
+    keyfile /etc/mosquitto/certs/sv.key
+    certfile /etc/mosquitto/certs/sv.crt
+    
+    {
+    NOTE: if you notice a lock icon on server key file then run following command to remove the protection:
+    --- sudo openssl rsa -in /etc/mosquitto/certs/sv.key -out /etc/mosquitto/certs/sv-n.key
+    --- sudo rm /etc/mosquitto/certs/sv.key 
+    --- sudo mv /etc/mosquitto/certs/sv-n.key /etc/mosquitto/certs/sv.key 
+    
+    This will make the keyfile to be readable for the broker.
+    }
+    
+8.  Copy an example ".conf" file for use:
+    --- sudo cp /usr/share/doc/mosquitto/examples/mosquitto.conf.gz /etc/mosquitto/conf.d/
+
+9.  Unzip it:
+    --- gzip -d /etc/mosquitto/conf.d/mosquitto.conf.gz
+    
+10. Find and edit following things in this config file:
+    (Remember to remove '#' before whatever line you edit.)
+    - In Default listener section put "port 8883", which is used for tls/ssl comm.
+    - In TLS/SSL section edit :
+        cafile /etc/mosquitto/ca_certificates/ca.crt
+        keyfile /etc/mosquitto/certs/sv.key
+        certfile /etc/mosquitto/certs/sv.crt
+    - Save it and exit.
+
+11. Now when running the broker, run it as:
+    --- mosquitto -c /etc/mosquitto/conf.d/mosquitto.conf
+    (Here we have specified the conf file it should be using to initialize itself)
+
+12. You should be able to see the broker is running on 8883 port instead of 1883 i.e default.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    
+IMPORTANT POINTS:
+1.  To use qos at mode 2, loop_start at publisher is important. And also the mosquitto_connect should be inside the loop.
+
+2.  For the Subscriber to get all the messages that were published while it was away, "clan_session" should be turned off and "client_id" must be specified.
+
+3.  
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+GUIDE:
+1.  http://www.steves-internet-guide.com/ - can look and understand the theory with the help of python examples.
+
+2.  https://www.hivemq.com/tags/mqtt-essentials/ - MQTT Theory
+
+3.  http://www.steves-internet-guide.com/mosquitto-tls/ - SSL/TLS Setup
+
