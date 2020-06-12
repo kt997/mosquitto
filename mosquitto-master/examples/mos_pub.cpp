@@ -4,9 +4,8 @@
 #include <string.h>
 #include <mosquitto.h>
 
-#define host "localhost"
-#define port 8883
-#define cafile "ca.crt"
+#define host "0.0.0.0"
+#define port 1883
 
 using namespace std;
 
@@ -20,8 +19,7 @@ int main()
     char msg[100]="This is Published.";
     mosq=mosquitto_new("pub1", 0, NULL);
     mosquitto_loop_start(mosq);
-    // mosquitto_tls_insecure_set(mosq, true);
-    int ret=mosquitto_tls_set(mosq, cafile, NULL, NULL, NULL, NULL);
+
     mosquitto_connect(mosq, host, port, 60);
     
     cout<<"hello"<<endl;

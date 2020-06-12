@@ -18,8 +18,9 @@ int main()
     
     char msg[100]="This is Published.";
     mosq=mosquitto_new("pub1", 0, NULL);
-    mosquitto_loop_start(mosq);
+    int loop=mosquitto_loop_start(mosq);
 
+    // cout<<"loop:"<<loop<<endl<<"errno:"<<MOSQ_ERR_SUCCESS<<endl;
     mosquitto_connect(mosq, host, port, 60);
     
     cout<<"hello"<<endl;

@@ -1,0 +1,6 @@
+compile with:
+
+g++ <pub_file_name> -o pub -lmosquitto
+g++ <sub_file_name> -o sub -lmosquitto
+
+for custom files just run 'make'
