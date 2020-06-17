@@ -1,10 +1,7 @@
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <mosquitto.h>
+#include "sub.h" 
+#include "sub_internals.h" 
 
-#define client_id1 "sub"
+#define client_id1 "sub2"
 #define pattern "#"
 #define host "localhost"
 #define port 1883
@@ -47,13 +44,14 @@ int main()
 {
     mosquitto *mosq;
 
-    mosquitto_lib_init();
+    // mosquitto_lib_init();
     int res=0;
     mosq=mosquitto_new(client_id1, 0, NULL);
     if(!mosq){
 		fprintf(stderr, "Error: Instance not made.\n");
 		exit(1);
 	}
+    else cout<<"passes\n";
     mosquitto_loop_start(mosq);
 
     mosquitto_connect(mosq, host, port, 60);     
@@ -62,14 +60,6 @@ int main()
     
     // mosquitto_disconnect(mosq);
     mosquitto_loop_stop(mosq, false);
-    mosquitto_lib_cleanup();
+    // mosquitto_lib_cleanup();
     return 0;
 }
-
-
-
-
-
-
-
-

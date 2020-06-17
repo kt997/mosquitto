@@ -25,7 +25,7 @@ int main()
         "topic/test",
         strlen((char*)msg),
         (char*)msg,
-        0,
+        1,
         1);
     usleep(1000000);
     if(res==MOSQ_ERR_SUCCESS ) cout<<"pub passed\n";

@@ -1,5 +1,5 @@
-#pragma once
-#include "pub_internals.h"
+ #pragma once
+#include "sub_internals.h"
 
 
 
@@ -69,16 +69,40 @@ void util__decrement_send_quota(struct mosquitto *mosq);
 int mosquitto__check_keepalive(struct mosquitto *mosq);
 
 
-int mosquitto_publish(struct mosquitto *mosq, int *mid, const char *topic, int payloadlen, const void *payload, int qos, bool retain);
+// int mosquitto_publish(struct mosquitto *mosq, int *mid, const char *topic, int payloadlen, const void *payload, int qos, bool retain);
 
 
-int mosquitto_publish_v5(struct mosquitto *mosq, int *mid, const char *topic, int payloadlen, const void *payload, int qos, bool retain, const mosquitto_property *properties);
+// int mosquitto_publish_v5(struct mosquitto *mosq, int *mid, const char *topic, int payloadlen, const void *payload, int qos, bool retain, const mosquitto_property *properties);
+
+
+int mosquitto_subscribe(struct mosquitto *mosq, int *mid, const char *sub, int qos);
+
+
+int mosquitto_subscribe_v5(struct mosquitto *mosq, int *mid, const char *sub, int qos, int options, const mosquitto_property *properties);
+
+
+int mosquitto_subscribe_multiple(struct mosquitto *mosq, int *mid, int sub_count, char *const *const sub, int qos, int options, const mosquitto_property *properties);
+
+
+int mosquitto_unsubscribe(struct mosquitto *mosq, int *mid, const char *sub);
+
+
+int mosquitto_unsubscribe_v5(struct mosquitto *mosq, int *mid, const char *sub, const mosquitto_property *properties);
+
+
+int mosquitto_unsubscribe_multiple(struct mosquitto *mosq, int *mid, int sub_count, char *const *const sub, const mosquitto_property *properties);
+
+
+void mosquitto_message_callback_set(struct mosquitto *mosq, void (*on_message)(struct mosquitto *, void *, const struct mosquitto_message *));
 
 
 int mosquitto_validate_utf8(const char *str, int len);
 
 
-int mosquitto_pub_topic_check(const char *str);
+// int mosquitto_pub_topic_check(const char *str);
+
+
+int mosquitto_sub_topic_check(const char *str);
 
 
 int property__get_length_all(const mosquitto_property *property);
@@ -105,7 +129,7 @@ void property__free(mosquitto_property **property);
 void mosquitto_property_free_all(mosquitto_property **property);
 
 
-int mosquitto_property_copy_all(mosquitto_property **dest, const mosquitto_property *src);
+// int mosquitto_property_copy_all(mosquitto_property **dest, const mosquitto_property *src);
 
 
 int mosquitto_property_check_all(int command, const mosquitto_property *properties);
@@ -204,6 +228,12 @@ int send__publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint3
 int send__real_publish(struct mosquitto *mosq, uint16_t mid, const char *topic, uint32_t payloadlen, const void *payload, int qos, bool retain, bool dup, const mosquitto_property *cmsg_props, const mosquitto_property *store_props, uint32_t expiry_interval);
 
 
+int send__subscribe(struct mosquitto *mosq, int *mid, int topic_count, const char **topic, int topic_qos, const mosquitto_property *properties);
+
+
+int send__unsubscribe(struct mosquitto *mosq, int *mid, int topic_count, char *const *const topic, const mosquitto_property *properties);
+
+
 int log__printf(struct mosquitto *mosq, int priority, const char *fmt, ...);
 
 
@@ -228,16 +258,16 @@ int message__release_to_inflight(struct mosquitto *mosq, enum mosquitto_msg_dire
 int message__remove(struct mosquitto *mosq, uint16_t mid, enum mosquitto_msg_direction dir, struct mosquitto_message_all **message, int qos);
 
 
-int message__delete(struct mosquitto *mosq, uint16_t mid, enum mosquitto_msg_direction dir, int qos);
+// int message__delete(struct mosquitto *mosq, uint16_t mid, enum mosquitto_msg_direction dir, int qos);
 
 
-int message__out_update(struct mosquitto *mosq, uint16_t mid, enum mosquitto_msg_state state, int qos);
-
-
-ssize_t net__write(struct mosquitto *mosq, void *buf, size_t count);
+// int message__out_update(struct mosquitto *mosq, uint16_t mid, enum mosquitto_msg_state state, int qos);
 
 
 void message__retry_check(struct mosquitto *mosq);
+
+
+ssize_t net__write(struct mosquitto *mosq, void *buf, size_t count);
 
 
 ssize_t net__read(struct mosquitto *mosq, void *buf, size_t count);
@@ -258,7 +288,7 @@ int net__socket_connect(struct mosquitto *mosq, const char *host, uint16_t port,
 int net__try_connect(const char *host, uint16_t port, mosq_sock_t *sock, const char *bind_address, bool blocking);
 
 
-int net__socket_connect_step3(struct mosquitto *mosq, const char *host);
+// int net__socket_connect_step3(struct mosquitto *mosq, const char *host);
 
 
 int send__connect(struct mosquitto *mosq, uint16_t keepalive, bool clean_session, const mosquitto_property *properties);
@@ -319,6 +349,15 @@ static void connack_callback(struct mosquitto *mosq, uint8_t reason_code, uint8_
 
 
 int handle__connack(struct mosquitto *mosq);
+
+
+int handle__suback(struct mosquitto *mosq);
+
+
+// int handle__unsuback(struct mosquitto *mosq);
+
+
+int handle__disconnect(struct mosquitto *mosq);
 
 
 int send__pingreq(struct mosquitto *mosq);
